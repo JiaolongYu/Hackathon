@@ -1,0 +1,15 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/GameTemplate/Scripts/PlayerController.js">
+    <Files>
+      <File FileName="Assets/GameTemplate/Scripts/Animals.js" Line="1" Column="1" />
+      <File FileName="Assets/GameTemplate/Scripts/PlayButton.js" Line="1" Column="1" />
+      <File FileName="Assets/GameTemplate/Scripts/BirdController.js" Line="1" Column="1" />
+      <File FileName="Assets/GameTemplate/Scripts/PlayerController.js" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
