@@ -73,12 +73,12 @@ public class SingleModeActivity extends AppCompatActivity {
     private MediaPlayer mPlayer;
 
     // initilzie soundpool and set to the max volume
-    AudioAttributes attributes = new AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build();
-
-    private SoundPool soundPool = new SoundPool.Builder().setAudioAttributes(attributes).build();
+//    AudioAttributes attributes = new AudioAttributes.Builder()
+//            .setUsage(AudioAttributes.USAGE_GAME)
+//            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//            .build();
+//
+//    private SoundPool soundPool = new SoundPool.Builder().setAudioAttributes(attributes).build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
