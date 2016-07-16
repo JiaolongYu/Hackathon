@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,9 +34,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CombatModeActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+public class CombatModeActivity extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener, RealTimeMessageReceivedListener,
         RoomStatusUpdateListener, RoomUpdateListener, OnInvitationReceivedListener {
+
+    /*
+     * API INTEGRATION SECTION. This section contains the code that integrates
+     * the game with the Google Play game services API.
+     */
+
+    final static String TAG = "ButtonClicker2000";
 
     // Request codes for the UIs that we show with startActivityForResult:
     final static int RC_SELECT_PLAYERS = 10000;
@@ -51,7 +60,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // Are we currently resolving a connection failure?
     private boolean mResolvingConnectionFailure = false;
 
-//    // Has the user clicked the sign-in button?
+    // Has the user clicked the sign-in button?
     private boolean mSignInClicked = false;
 
     // Set to true to automatically start the sign in flow when the Activity starts.
@@ -79,7 +88,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     byte[] mMsgBuf = new byte[2];
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_combat_mode);
 
@@ -89,9 +98,6 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                 .addOnConnectionFailedListener(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
-
-        mSignInClicked = true;
-        mGoogleApiClient.connect();
 
         // set up a click listener for everything we care about
         for (int id : CLICKABLES) {
@@ -104,38 +110,38 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         Intent intent;
 
         switch (v.getId()) {
-//            case R.id.button_single_player:
-//            case R.id.button_single_player_2:
-//                // play a single-player game
-//                resetGameVars();
-//                startGame(false);
-//                break;
-//            case R.id.button_sign_in:
-//                // user wants to sign in
-//                // Check to see the developer who's running this sample code read the instructions :-)
-//                // NOTE: this check is here only because this is a sample! Don't include this
-//                // check in your actual production app.
-////                if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
-////                    Log.w(TAG, "*** Warning: setup problems detected. Sign in may not work!");
-////                }
-////
-////                // start the sign-in flow
-////                Log.d(TAG, "Sign-in button clicked");
-//                mSignInClicked = true;
-//                mGoogleApiClient.connect();
-//                break;
-//            case R.id.button_sign_out:
-//                // user wants to sign out
-//                // sign out.
-////                Log.d(TAG, "Sign-out button clicked");
-//                mSignInClicked = false;
-//                Games.signOut(mGoogleApiClient);
-//                mGoogleApiClient.disconnect();
-//                switchToScreen(R.id.screen_sign_in);
-//                break;
+            case R.id.button_single_player:
+            case R.id.button_single_player_2:
+                // play a single-player game
+                resetGameVars();
+                startGame(false);
+                break;
+            case R.id.button_sign_in:
+                // user wants to sign in
+                // Check to see the developer who's running this sample code read the instructions :-)
+                // NOTE: this check is here only because this is a sample! Don't include this
+                // check in your actual production app.
+                if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
+                    Log.w(TAG, "*** Warning: setup problems detected. Sign in may not work!");
+                }
+
+                // start the sign-in flow
+                Log.d(TAG, "Sign-in button clicked");
+                mSignInClicked = true;
+                mGoogleApiClient.connect();
+                break;
+            case R.id.button_sign_out:
+                // user wants to sign out
+                // sign out.
+                Log.d(TAG, "Sign-out button clicked");
+                mSignInClicked = false;
+                Games.signOut(mGoogleApiClient);
+                mGoogleApiClient.disconnect();
+                switchToScreen(R.id.screen_sign_in);
+                break;
             case R.id.button_invite_players:
                 // show list of invitable players
-                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 2);
+                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
                 switchToScreen(R.id.screen_wait);
                 startActivityForResult(intent, RC_SELECT_PLAYERS);
                 break;
@@ -196,7 +202,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                 // we got the result from the "waiting room" UI.
                 if (responseCode == Activity.RESULT_OK) {
                     // ready to start playing
-//                    Log.d(TAG, "Starting game (waiting room returned OK).");
+                    Log.d(TAG, "Starting game (waiting room returned OK).");
                     startGame(true);
                 } else if (responseCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                     // player indicated that they want to leave the room
@@ -209,8 +215,8 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                 }
                 break;
             case RC_SIGN_IN:
-//                Log.d(TAG, "onActivityResult with requestCode == RC_SIGN_IN, responseCode="
-//                        + responseCode + ", intent=" + intent);
+                Log.d(TAG, "onActivityResult with requestCode == RC_SIGN_IN, responseCode="
+                        + responseCode + ", intent=" + intent);
                 mSignInClicked = false;
                 mResolvingConnectionFailure = false;
                 if (responseCode == RESULT_OK) {
@@ -227,16 +233,16 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // "Invite friends" button. We react by creating a room with those players.
     private void handleSelectPlayersResult(int response, Intent data) {
         if (response != Activity.RESULT_OK) {
-//            Log.w(TAG, "*** select players UI cancelled, " + response);
+            Log.w(TAG, "*** select players UI cancelled, " + response);
             switchToMainScreen();
             return;
         }
 
-//        Log.d(TAG, "Select players UI succeeded.");
+        Log.d(TAG, "Select players UI succeeded.");
 
         // get the invitee list
         final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-//        Log.d(TAG, "Invitee count: " + invitees.size());
+        Log.d(TAG, "Invitee count: " + invitees.size());
 
         // get the automatch criteria
         Bundle autoMatchCriteria = null;
@@ -245,11 +251,11 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         if (minAutoMatchPlayers > 0 || maxAutoMatchPlayers > 0) {
             autoMatchCriteria = RoomConfig.createAutoMatchCriteria(
                     minAutoMatchPlayers, maxAutoMatchPlayers, 0);
-//            Log.d(TAG, "Automatch criteria: " + autoMatchCriteria);
+            Log.d(TAG, "Automatch criteria: " + autoMatchCriteria);
         }
 
         // create the room
-//        Log.d(TAG, "Creating room...");
+        Log.d(TAG, "Creating room...");
         RoomConfig.Builder rtmConfigBuilder = RoomConfig.builder(this);
         rtmConfigBuilder.addPlayersToInvite(invitees);
         rtmConfigBuilder.setMessageReceivedListener(this);
@@ -261,19 +267,19 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         keepScreenOn();
         resetGameVars();
         Games.RealTimeMultiplayer.create(mGoogleApiClient, rtmConfigBuilder.build());
-//        Log.d(TAG, "Room created, waiting for it to be ready...");
+        Log.d(TAG, "Room created, waiting for it to be ready...");
     }
 
     // Handle the result of the invitation inbox UI, where the player can pick an invitation
     // to accept. We react by accepting the selected invitation, if any.
     private void handleInvitationInboxResult(int response, Intent data) {
         if (response != Activity.RESULT_OK) {
-//            Log.w(TAG, "*** invitation inbox UI cancelled, " + response);
+            Log.w(TAG, "*** invitation inbox UI cancelled, " + response);
             switchToMainScreen();
             return;
         }
 
-//        Log.d(TAG, "Invitation inbox UI succeeded.");
+        Log.d(TAG, "Invitation inbox UI succeeded.");
         Invitation inv = data.getExtras().getParcelable(Multiplayer.EXTRA_INVITATION);
 
         // accept invitation
@@ -283,7 +289,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // Accept the given invitation.
     void acceptInviteToRoom(String invId) {
         // accept the invitation
-//        Log.d(TAG, "Accepting invitation: " + invId);
+        Log.d(TAG, "Accepting invitation: " + invId);
         RoomConfig.Builder roomConfigBuilder = RoomConfig.builder(this);
         roomConfigBuilder.setInvitationIdToAccept(invId)
                 .setMessageReceivedListener(this)
@@ -297,7 +303,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // Activity is going to the background. We have to leave the current room.
     @Override
     public void onStop() {
-//        Log.d(TAG, "**** got onStop");
+        Log.d(TAG, "**** got onStop");
 
         // if we're in a room, leave it.
         leaveRoom();
@@ -306,7 +312,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         stopKeepingScreenOn();
 
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()){
-            this.finish();
+            switchToScreen(R.id.screen_sign_in);
         }
         else {
             switchToScreen(R.id.screen_wait);
@@ -322,27 +328,13 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     public void onStart() {
         switchToScreen(R.id.screen_wait);
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-//            Log.w(TAG,
-//                    "GameHelper: client was already connected on onStart()");
+            Log.w(TAG,
+                    "GameHelper: client was already connected on onStart()");
         } else {
-//            Log.d(TAG,"Connecting client.");
+            Log.d(TAG,"Connecting client.");
             mGoogleApiClient.connect();
         }
         super.onStart();
-    }
-
-    void exitCurtAccount() {
-        mSignInClicked = false;
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            Games.signOut(mGoogleApiClient);
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    public void onDestroy() {
-        exitCurtAccount();
-//        switchToScreen(R.id.screen_sign_in);
-        super.onDestroy();
     }
 
     // Handle back key to make sure we cleanly leave a game if we are in the middle of one
@@ -357,7 +349,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
 
     // Leave the room.
     void leaveRoom() {
-//        Log.d(TAG, "Leaving room.");
+        Log.d(TAG, "Leaving room.");
         mSecondsLeft = 0;
         stopKeepingScreenOn();
         if (mRoomId != null) {
@@ -412,21 +404,21 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
 
     @Override
     public void onConnected(Bundle connectionHint) {
-//        Log.d(TAG, "onConnected() called. Sign in successful!");
+        Log.d(TAG, "onConnected() called. Sign in successful!");
 
-//        Log.d(TAG, "Sign-in succeeded.");
+        Log.d(TAG, "Sign-in succeeded.");
 
         // register listener so we are notified if we receive an invitation to play
         // while we are in the game
         Games.Invitations.registerInvitationListener(mGoogleApiClient, this);
 
         if (connectionHint != null) {
-//            Log.d(TAG, "onConnected: connection hint provided. Checking for invite.");
+            Log.d(TAG, "onConnected: connection hint provided. Checking for invite.");
             Invitation inv = connectionHint
                     .getParcelable(Multiplayer.EXTRA_INVITATION);
             if (inv != null && inv.getInvitationId() != null) {
                 // retrieve and cache the invitation ID
-//                Log.d(TAG,"onConnected: connection hint has a room invite!");
+                Log.d(TAG,"onConnected: connection hint has a room invite!");
                 acceptInviteToRoom(inv.getInvitationId());
                 return;
             }
@@ -437,16 +429,16 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
 
     @Override
     public void onConnectionSuspended(int i) {
-//        Log.d(TAG, "onConnectionSuspended() called. Trying to reconnect.");
+        Log.d(TAG, "onConnectionSuspended() called. Trying to reconnect.");
         mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-//        Log.d(TAG, "onConnectionFailed() called, result: " + connectionResult);
+        Log.d(TAG, "onConnectionFailed() called, result: " + connectionResult);
 
         if (mResolvingConnectionFailure) {
-//            Log.d(TAG, "onConnectionFailed() ignoring connection failure; already resolving.");
+            Log.d(TAG, "onConnectionFailed() ignoring connection failure; already resolving.");
             return;
         }
 
@@ -457,15 +449,14 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                     connectionResult, RC_SIGN_IN, getString(R.string.signin_other_error));
         }
 
-//        switchToScreen(R.id.screen_sign_in);
-        this.finish();
+        switchToScreen(R.id.screen_sign_in);
     }
 
     // Called when we are connected to the room. We're not ready to play yet! (maybe not everybody
     // is connected yet).
     @Override
     public void onConnectedToRoom(Room room) {
-//        Log.d(TAG, "onConnectedToRoom.");
+        Log.d(TAG, "onConnectedToRoom.");
 
         //get participants and my ID:
         mParticipants = room.getParticipants();
@@ -476,9 +467,9 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
             mRoomId = room.getRoomId();
 
         // print out the list of participants (for debug purposes)
-//        Log.d(TAG, "Room ID: " + mRoomId);
-//        Log.d(TAG, "My ID " + mMyId);
-//        Log.d(TAG, "<< CONNECTED TO ROOM>>");
+        Log.d(TAG, "Room ID: " + mRoomId);
+        Log.d(TAG, "My ID " + mMyId);
+        Log.d(TAG, "<< CONNECTED TO ROOM>>");
     }
 
     // Called when we've successfully left the room (this happens a result of voluntarily leaving
@@ -486,7 +477,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     @Override
     public void onLeftRoom(int statusCode, String roomId) {
         // we have left the room; return to main screen.
-//        Log.d(TAG, "onLeftRoom, code " + statusCode);
+        Log.d(TAG, "onLeftRoom, code " + statusCode);
         switchToMainScreen();
     }
 
@@ -506,9 +497,9 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // Called when room has been created
     @Override
     public void onRoomCreated(int statusCode, Room room) {
-//        Log.d(TAG, "onRoomCreated(" + statusCode + ", " + room + ")");
+        Log.d(TAG, "onRoomCreated(" + statusCode + ", " + room + ")");
         if (statusCode != GamesStatusCodes.STATUS_OK) {
-//            Log.e(TAG, "*** Error: onRoomCreated, status " + statusCode);
+            Log.e(TAG, "*** Error: onRoomCreated, status " + statusCode);
             showGameError();
             return;
         }
@@ -523,9 +514,9 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // Called when room is fully connected.
     @Override
     public void onRoomConnected(int statusCode, Room room) {
-//        Log.d(TAG, "onRoomConnected(" + statusCode + ", " + room + ")");
+        Log.d(TAG, "onRoomConnected(" + statusCode + ", " + room + ")");
         if (statusCode != GamesStatusCodes.STATUS_OK) {
-//            Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
+            Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             showGameError();
             return;
         }
@@ -534,9 +525,9 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
 
     @Override
     public void onJoinedRoom(int statusCode, Room room) {
-//        Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ")");
+        Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ")");
         if (statusCode != GamesStatusCodes.STATUS_OK) {
-//            Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
+            Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             showGameError();
             return;
         }
@@ -695,7 +686,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
         byte[] buf = rtm.getMessageData();
         String sender = rtm.getSenderParticipantId();
-//        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
+        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
 
         if (buf[0] == 'F' || buf[0] == 'U') {
             // score update.
@@ -761,15 +752,14 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // event handlers.
     final static int[] CLICKABLES = {
             R.id.button_accept_popup_invitation, R.id.button_invite_players,
-            R.id.button_quick_game, R.id.button_see_invitations,
-            R.id.button_sign_out, R.id.button_click_me
-//            ,R.id.button_single_player_2,  R.id.button_sign_in, R.id.button_single_player
+            R.id.button_quick_game, R.id.button_see_invitations, R.id.button_sign_in,
+            R.id.button_sign_out, R.id.button_click_me, R.id.button_single_player,
+            R.id.button_single_player_2
     };
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
-//            R.id.screen_sign_in,
-            R.id.screen_game, R.id.screen_main,
+            R.id.screen_game, R.id.screen_main, R.id.screen_sign_in,
             R.id.screen_wait
     };
     int mCurScreen = -1;
@@ -801,10 +791,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
             switchToScreen(R.id.screen_main);
         }
         else {
-//            switchToScreen(R.id.screen_sign_in);
-//            onDestroy();
-            exitCurtAccount();
-            this.finish();
+            switchToScreen(R.id.screen_sign_in);
         }
     }
 
@@ -867,3 +854,4 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }
+
