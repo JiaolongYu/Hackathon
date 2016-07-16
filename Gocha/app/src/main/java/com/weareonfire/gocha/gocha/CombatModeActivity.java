@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -91,6 +90,9 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
 
+        mSignInClicked = true;
+        mGoogleApiClient.connect();
+
         // set up a click listener for everything we care about
         for (int id : CLICKABLES) {
             findViewById(id).setOnClickListener(this);
@@ -108,32 +110,32 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
 //                resetGameVars();
 //                startGame(false);
 //                break;
-            case R.id.button_sign_in:
-                // user wants to sign in
-                // Check to see the developer who's running this sample code read the instructions :-)
-                // NOTE: this check is here only because this is a sample! Don't include this
-                // check in your actual production app.
-//                if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
-//                    Log.w(TAG, "*** Warning: setup problems detected. Sign in may not work!");
-//                }
-//
-//                // start the sign-in flow
-//                Log.d(TAG, "Sign-in button clicked");
-                mSignInClicked = true;
-                mGoogleApiClient.connect();
-                break;
-            case R.id.button_sign_out:
-                // user wants to sign out
-                // sign out.
-//                Log.d(TAG, "Sign-out button clicked");
-                mSignInClicked = false;
-                Games.signOut(mGoogleApiClient);
-                mGoogleApiClient.disconnect();
-                switchToScreen(R.id.screen_sign_in);
-                break;
+//            case R.id.button_sign_in:
+//                // user wants to sign in
+//                // Check to see the developer who's running this sample code read the instructions :-)
+//                // NOTE: this check is here only because this is a sample! Don't include this
+//                // check in your actual production app.
+////                if (!BaseGameUtils.verifySampleSetup(this, R.string.app_id)) {
+////                    Log.w(TAG, "*** Warning: setup problems detected. Sign in may not work!");
+////                }
+////
+////                // start the sign-in flow
+////                Log.d(TAG, "Sign-in button clicked");
+//                mSignInClicked = true;
+//                mGoogleApiClient.connect();
+//                break;
+//            case R.id.button_sign_out:
+//                // user wants to sign out
+//                // sign out.
+////                Log.d(TAG, "Sign-out button clicked");
+//                mSignInClicked = false;
+//                Games.signOut(mGoogleApiClient);
+//                mGoogleApiClient.disconnect();
+//                switchToScreen(R.id.screen_sign_in);
+//                break;
             case R.id.button_invite_players:
                 // show list of invitable players
-                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
+                intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 2);
                 switchToScreen(R.id.screen_wait);
                 startActivityForResult(intent, RC_SELECT_PLAYERS);
                 break;
@@ -208,7 +210,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                 break;
             case RC_SIGN_IN:
 //                Log.d(TAG, "onActivityResult with requestCode == RC_SIGN_IN, responseCode="
-                        + responseCode + ", intent=" + intent);
+//                        + responseCode + ", intent=" + intent);
                 mSignInClicked = false;
                 mResolvingConnectionFailure = false;
                 if (responseCode == RESULT_OK) {
@@ -304,7 +306,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         stopKeepingScreenOn();
 
         if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()){
-            switchToScreen(R.id.screen_sign_in);
+            this.finish();
         }
         else {
             switchToScreen(R.id.screen_wait);
@@ -321,12 +323,26 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
         switchToScreen(R.id.screen_wait);
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
 //            Log.w(TAG,
-                    "GameHelper: client was already connected on onStart()");
+//                    "GameHelper: client was already connected on onStart()");
         } else {
 //            Log.d(TAG,"Connecting client.");
             mGoogleApiClient.connect();
         }
         super.onStart();
+    }
+
+    void exitCurtAccount() {
+        mSignInClicked = false;
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            Games.signOut(mGoogleApiClient);
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    public void onDestroy() {
+        exitCurtAccount();
+//        switchToScreen(R.id.screen_sign_in);
+        super.onDestroy();
     }
 
     // Handle back key to make sure we cleanly leave a game if we are in the middle of one
@@ -441,7 +457,8 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                     connectionResult, RC_SIGN_IN, getString(R.string.signin_other_error));
         }
 
-        switchToScreen(R.id.screen_sign_in);
+//        switchToScreen(R.id.screen_sign_in);
+        this.finish();
     }
 
     // Called when we are connected to the room. We're not ready to play yet! (maybe not everybody
@@ -744,14 +761,15 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     // event handlers.
     final static int[] CLICKABLES = {
             R.id.button_accept_popup_invitation, R.id.button_invite_players,
-            R.id.button_quick_game, R.id.button_see_invitations, R.id.button_sign_in,
-            R.id.button_sign_out, R.id.button_click_me, R.id.button_single_player,
-            R.id.button_single_player_2
+            R.id.button_quick_game, R.id.button_see_invitations,
+            R.id.button_sign_out, R.id.button_click_me
+//            ,R.id.button_single_player_2,  R.id.button_sign_in, R.id.button_single_player
     };
 
     // This array lists all the individual screens our game has.
     final static int[] SCREENS = {
-            R.id.screen_game, R.id.screen_main, R.id.screen_sign_in,
+//            R.id.screen_sign_in,
+            R.id.screen_game, R.id.screen_main,
             R.id.screen_wait
     };
     int mCurScreen = -1;
@@ -783,7 +801,10 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
             switchToScreen(R.id.screen_main);
         }
         else {
-            switchToScreen(R.id.screen_sign_in);
+//            switchToScreen(R.id.screen_sign_in);
+//            onDestroy();
+            exitCurtAccount();
+            this.finish();
         }
     }
 
