@@ -40,6 +40,8 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".CombatModeActivity"></activity>
+        <activity android:name=".SettingActivity" />
+        <activity android:name=".StoreActivity"></activity>
     </application>
 
 </manifest>
