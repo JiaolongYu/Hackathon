@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class SingleModeActivity extends AppCompatActivity {
     List<RelativeLayout> tracks = new ArrayList<>(4);
-    List<Integer> generic_images = new ArrayList<>(3);
+    List<Integer> generic_images = new ArrayList<>(2);
     int exempt_image_id; //id for the exempt pic
     int ink_image_id; //id for the ink pic
     Set<Integer> exempt_images_set = new HashSet<>();
@@ -43,6 +43,8 @@ public class SingleModeActivity extends AppCompatActivity {
     private int leftNext = R.id.leftin;
     private boolean gameEnd = false;
     private int points = 0;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
 
     private boolean exempt_on = false;
     private int exempt_val = 0;
@@ -59,10 +61,10 @@ public class SingleModeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_mode);
 
-        final SharedPreferences sharedPref = context.getSharedPreferences("preferences",Context.MODE_PRIVATE);
+        sharedPref = context.getSharedPreferences("preferences",Context.MODE_PRIVATE);
         soundOn = sharedPref.getBoolean("soundOn", true);
         musicOn = sharedPref.getBoolean("musicOn", true);
-
+        editor = sharedPref.edit();
         mPlayer = MediaPlayer.create(this, R.raw.music1);
         if (mPlayer != null) {
             mPlayer.setLooping(true);
@@ -75,11 +77,10 @@ public class SingleModeActivity extends AppCompatActivity {
         tracks.add ((RelativeLayout) findViewById(R.id.rightin));
         tracks.add ((RelativeLayout) findViewById(R.id.rightout));
 
-        generic_images.add(R.drawable.ic_grade_black_24dp);
-        generic_images.add(R.drawable.ic_invert_colors_black_24dp);
-        generic_images.add(R.drawable.ic_report_problem_black_24dp);
-        exempt_image_id = R.drawable.ic_pregnant_woman_black_24dp; //assign preg woman to exempt_img_id
-        ink_image_id = R.drawable.ic_rowing_black_24dp; //assign rowing to ink_img_id
+        generic_images.add(R.drawable.goodlittlefish1);
+        generic_images.add(R.drawable.goodlittlefish2);
+        exempt_image_id = R.drawable.pearlexempt; //assign preg woman to exempt_img_id
+        ink_image_id = R.drawable.octopus; //assign rowing to ink_img_id
         //exempt_images.add(R.drawable.ic_rowing_black_24dp);
         //exempt_images_set.addAll(exempt_images);
 
@@ -131,7 +132,7 @@ public class SingleModeActivity extends AppCompatActivity {
             float randf = random.nextFloat();
             final int currentImgId;
             if (randf<=0.8){
-                currentImgId = generic_images.get(random.nextInt(3));
+                currentImgId = generic_images.get(random.nextInt(2));
                 randomImage.setImageResource(currentImgId);
 
             }
@@ -215,39 +216,10 @@ public class SingleModeActivity extends AppCompatActivity {
                         if (exempt_val==0){
                             exempt_on = false;
                         }
-
                     }
-
                     else {
-                        gameEnd = true;
-                        RelativeLayout rightHalf = (RelativeLayout) findViewById(R.id.righthalf);
-                        rightHalf.setOnClickListener(null);
-                        LinearLayout gameOver = (LinearLayout) findViewById(R.id.gameover);
-                        TextView gameOverText = (TextView)findViewById(R.id.gameoverpoints);
-                        gameOverText.setText("Points: " + points);
-                        Button restart = (Button) findViewById(R.id.restart);
-                        Button quit = (Button) findViewById(R.id.quit);
-                        restart.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
-                            }
-                        });
-                        quit.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(SingleModeActivity.this, FrontPageActivity.class);
-                                startActivity(intent);
-                            }
-                        });
-                        gameOver.setVisibility(View.VISIBLE);
                         currentLayout.removeView(randomImage);
-                        lHandler.removeMessages(0);
-                        lHandler.removeMessages(1);
-                        rHandler.removeMessages(2);
-                        rHandler.removeMessages(3);
+                        endGame();
                     }
                 }
 
@@ -268,7 +240,7 @@ public class SingleModeActivity extends AppCompatActivity {
             float randf = random.nextFloat();
             final int currentImgId;
             if (randf<=0.8){ //control the prob for different imgs
-                currentImgId = generic_images.get(random.nextInt(3));
+                currentImgId = generic_images.get(random.nextInt(2));
                 randomImage.setImageResource(currentImgId);
             }
             else if (randf>0.8 && randf<=0.9){
@@ -349,39 +321,10 @@ public class SingleModeActivity extends AppCompatActivity {
                         if (exempt_val==0){
                             exempt_on = false;
                         }
-
                     }
-
                     else {
-                        gameEnd = true;
-                        RelativeLayout leftHalf = (RelativeLayout) findViewById(R.id.lefthalf);
-                        leftHalf.setOnClickListener(null);
-                        LinearLayout gameOver = (LinearLayout) findViewById(R.id.gameover);
-                        TextView gameOverText = (TextView)findViewById(R.id.gameoverpoints);
-                        gameOverText.setText("Points: " + points);
-                        Button restart = (Button) findViewById(R.id.restart);
-                        Button quit = (Button) findViewById(R.id.quit);
-                        restart.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
-                            }
-                        });
-                        quit.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(SingleModeActivity.this, FrontPageActivity.class);
-                                startActivity(intent);
-                            }
-                        });
-                        gameOver.setVisibility(View.VISIBLE);
                         currentLayout.removeView(randomImage);
-                        lHandler.removeMessages(0);
-                        lHandler.removeMessages(1);
-                        rHandler.removeMessages(2);
-                        rHandler.removeMessages(3);
+                        endGame();
                     }
 
                 }
@@ -403,5 +346,41 @@ public class SingleModeActivity extends AppCompatActivity {
         if (musicOn) mPlayer.stop();
 //        mServ.stopMusic();
 //        doUnbindService();
+    }
+
+    private void endGame() {
+        gameEnd = true;
+        RelativeLayout rightHalf = (RelativeLayout) findViewById(R.id.righthalf);
+        rightHalf.setOnClickListener(null);
+        RelativeLayout leftHalf = (RelativeLayout) findViewById(R.id.lefthalf);
+        leftHalf.setOnClickListener(null);
+        LinearLayout gameOver = (LinearLayout) findViewById(R.id.gameover);
+        TextView gameOverText = (TextView)findViewById(R.id.gameoverpoints);
+        gameOverText.setText("Points: " + points + " Coins Gain: " + (points / 4) );
+        Button restart = (Button) findViewById(R.id.restart);
+        Button quit = (Button) findViewById(R.id.quit);
+        restart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            }
+        });
+        quit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SingleModeActivity.this, FrontPageActivity.class);
+                startActivity(intent);
+            }
+        });
+        gameOver.setVisibility(View.VISIBLE);
+
+        int coins = sharedPref.getInt("coins", 0 );
+        editor.putInt("coins",coins + points / 10);
+        lHandler.removeMessages(0);
+        lHandler.removeMessages(1);
+        rHandler.removeMessages(2);
+        rHandler.removeMessages(3);
     }
 }
