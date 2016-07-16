@@ -11,8 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
-public class FrontPageActivity extends AppCompatActivity {
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
 
+public class FrontPageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +45,15 @@ public class FrontPageActivity extends AppCompatActivity {
                 bundle.putBoolean("reverse", true);
                 toLoginActivityIntent.putExtras(bundle);
                 startActivity(toLoginActivityIntent);
+            }
+        });
+
+        Button combatModeButton = (Button) findViewById(R.id.combat_mode);
+        combatModeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent toCombatModeActivity = new Intent(FrontPageActivity.this, CombatModeActivity.class);
+                startActivity(toCombatModeActivity);
             }
         });
 
