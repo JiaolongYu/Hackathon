@@ -35,7 +35,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
     private boolean mResolvingConnectionFailure = false;
 
 //    // Has the user clicked the sign-in button?
-//    private boolean mSignInClicked = false;
+    private boolean mSignInClicked = false;
 
     // Set to true to automatically start the sign in flow when the Activity starts.
     // Set to false to require the user to click the button in order to sign in.
@@ -87,8 +87,8 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
             case R.id.button_single_player:
             case R.id.button_single_player_2:
                 // play a single-player game
-//                resetGameVars();
-//                startGame(false);
+                resetGameVars();
+                startGame(false);
                 break;
             case R.id.button_sign_in:
                 // user wants to sign in
@@ -101,7 +101,7 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
 //
 //                // start the sign-in flow
 //                Log.d(TAG, "Sign-in button clicked");
-//                mSignInClicked = true;
+                mSignInClicked = true;
                 mGoogleApiClient.connect();
                 break;
             case R.id.button_sign_out:
@@ -111,33 +111,33 @@ public class CombatModeActivity extends AppCompatActivity implements GoogleApiCl
                 mSignInClicked = false;
                 Games.signOut(mGoogleApiClient);
                 mGoogleApiClient.disconnect();
-//                switchToScreen(R.id.screen_sign_in);
+                switchToScreen(R.id.screen_sign_in);
                 break;
             case R.id.button_invite_players:
                 // show list of invitable players
                 intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 3);
-//                switchToScreen(R.id.screen_wait);
+                switchToScreen(R.id.screen_wait);
                 startActivityForResult(intent, RC_SELECT_PLAYERS);
                 break;
             case R.id.button_see_invitations:
                 // show list of pending invitations
                 intent = Games.Invitations.getInvitationInboxIntent(mGoogleApiClient);
-//                switchToScreen(R.id.screen_wait);
+                switchToScreen(R.id.screen_wait);
                 startActivityForResult(intent, RC_INVITATION_INBOX);
                 break;
             case R.id.button_accept_popup_invitation:
                 // user wants to accept the invitation shown on the invitation popup
                 // (the one we got through the OnInvitationReceivedListener).
-//                acceptInviteToRoom(mIncomingInvitationId);
+                acceptInviteToRoom(mIncomingInvitationId);
                 mIncomingInvitationId = null;
                 break;
             case R.id.button_quick_game:
                 // user wants to play against a random opponent right now
-//                startQuickGame();
+                startQuickGame();
                 break;
             case R.id.button_click_me:
                 // (gameplay) user clicked the "click me" button
-//                scoreOnePoint();
+                scoreOnePoint();
                 break;
         }
     }
