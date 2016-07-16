@@ -1,19 +1,13 @@
 package com.weareonfire.gocha.gocha;
 
 import android.content.Intent;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
@@ -33,9 +27,9 @@ public class FrontPageActivity extends AppCompatActivity {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
                 Intent toLoginActivityIntent = new Intent(FrontPageActivity.this, SingleModeActivity.class);
-                Bundle bundle=new Bundle();
-                bundle.putBoolean("reverse", false);
-                toLoginActivityIntent.putExtras(bundle);
+//                Bundle bundle=new Bundle();
+//                bundle.putBoolean("reverse", false);
+//                toLoginActivityIntent.putExtras(bundle);
                 startActivity(toLoginActivityIntent);
             }
         });
@@ -44,10 +38,10 @@ public class FrontPageActivity extends AppCompatActivity {
         hardModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toLoginActivityIntent = new Intent(FrontPageActivity.this, SingleModeActivity.class);
-                Bundle bundle=new Bundle();
-                bundle.putBoolean("reverse", true);
-                toLoginActivityIntent.putExtras(bundle);
+                Intent toLoginActivityIntent = new Intent(FrontPageActivity.this, HardModeActivity.class);
+//                Bundle bundle=new Bundle();
+//                bundle.putBoolean("reverse", true);
+//                toLoginActivityIntent.putExtras(bundle);
                 startActivity(toLoginActivityIntent);
             }
         });
